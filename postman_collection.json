@@ -1,0 +1,497 @@
+{
+  "info": {
+    "_postman_id": "b3e9a11d-4001-4c12-92a0-akatsuki-nodevember",
+    "name": "Nodevember 4.0 - Akatsuki's Draft API",
+    "description": "Complete API Collection for Akatsuki's Draft: AI-Enabled Content Sharing Platform (Backend). Includes automatic token management, User flows, Admin flows, and Gemini AI integration.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "userToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "postId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "newDraftId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": ["{{baseUrl}}"],
+          "path": [""]
+        },
+        "description": "Check if the Akatsuki's Draft server is running."
+      }
+    },
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Register Regular User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.token) {",
+                  "    pm.collectionVariables.set('userToken', response.token);",
+                  "    console.log('User Token set successfully:', response.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Itachi Uchiha\",\n  \"email\": \"itachi@akatsuki.com\",\n  \"password\": \"password123\",\n  \"role\": \"user\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Register a new regular user with role 'user'."
+          }
+        },
+        {
+          "name": "Register Admin User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.token) {",
+                  "    pm.collectionVariables.set('adminToken', response.token);",
+                  "    console.log('Admin Token set successfully:', response.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pain Leader\",\n  \"email\": \"pain@akatsuki.com\",\n  \"password\": \"admin12345\",\n  \"role\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Register an admin user with role 'admin'."
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.token) {",
+                  "    pm.collectionVariables.set('userToken', response.token);",
+                  "    console.log('User Token set successfully:', response.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"itachi@akatsuki.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Log in with regular user credentials and auto-store userToken."
+          }
+        },
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.token) {",
+                  "    pm.collectionVariables.set('adminToken', response.token);",
+                  "    console.log('Admin Token set successfully:', response.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"pain@akatsuki.com\",\n  \"password\": \"admin12345\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Log in with admin credentials and auto-store adminToken."
+          }
+        },
+        {
+          "name": "Get Profile (GET /auth/me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Get current logged-in user profile using Bearer token."
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. User - Post Management",
+      "item": [
+        {
+          "name": "Create Post / Draft (POST /posts)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.post && response.post._id) {",
+                  "    pm.collectionVariables.set('postId', response.post._id);",
+                  "    console.log('Created Post ID:', response.post._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Architecting High-Throughput Node.js Microservices\",\n  \"description\": \"A practical guide explaining event loops, worker threads, and memory optimization in backend services.\",\n  \"content\": \"Building fast backend services requires understanding Node.js non-blocking I/O model. In this article we explore clustering, connection pooling in MongoDB, and caching with Redis to achieve sub-millisecond response times under peak load.\",\n  \"category\": \"Technology\",\n  \"image\": \"https://images.unsplash.com/photo-1558494949-ef010cbdcc31\",\n  \"status\": \"draft\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts"]
+            },
+            "description": "Create a new post or draft (status can be 'draft' or 'pending')."
+          }
+        },
+        {
+          "name": "Submit Post for Approval (status: pending)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.post && response.post._id) {",
+                  "    pm.collectionVariables.set('postId', response.post._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Deep Dive into Generative AI for Developers\",\n  \"description\": \"How to integrate LLMs into modern backend architectures.\",\n  \"content\": \"Generative AI APIs like Gemini allow developers to automate text transformations, semantic analysis, and content generation. Here is how to handle prompt engineering and response structuring.\",\n  \"category\": \"Artificial Intelligence\",\n  \"image\": \"https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe\",\n  \"status\": \"pending\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts"]
+            },
+            "description": "Create a post directly submitted as 'pending' for admin review."
+          }
+        },
+        {
+          "name": "View All Approved Posts (GET /posts)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/posts",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts"]
+            },
+            "description": "Public route to explore all approved posts published on the platform."
+          }
+        },
+        {
+          "name": "View My Posts and Drafts (GET /posts/my-posts)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/posts/my-posts",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts", "my-posts"]
+            },
+            "description": "View all posts and drafts authored by the logged-in user."
+          }
+        },
+        {
+          "name": "View Post by ID (GET /posts/:id)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{postId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts", "{{postId}}"]
+            },
+            "description": "View an approved post by ID (or own draft/pending if authorized)."
+          }
+        },
+        {
+          "name": "Update My Post (PATCH /posts/:id)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Architecting High-Throughput Node.js Microservices (v2)\",\n  \"description\": \"Updated comprehensive guide covering clustering and memory optimizations.\",\n  \"status\": \"pending\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{postId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts", "{{postId}}"]
+            },
+            "description": "Update your own post or submit draft for review (status: pending)."
+          }
+        },
+        {
+          "name": "Delete My Post (DELETE /posts/:id)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{postId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts", "{{postId}}"]
+            },
+            "description": "Delete your own post by ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Admin - Post Approval",
+      "item": [
+        {
+          "name": "View Pending Posts (GET /admin/posts/pending)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/posts/pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "posts", "pending"]
+            },
+            "description": "Admin endpoint: View all posts awaiting approval."
+          }
+        },
+        {
+          "name": "Approve Post (PATCH /admin/posts/approve/:id)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/posts/approve/{{postId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "posts", "approve", "{{postId}}"]
+            },
+            "description": "Admin endpoint: Approve a pending post and make it public."
+          }
+        },
+        {
+          "name": "Reject Post (PATCH /admin/posts/reject/:id)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/posts/reject/{{postId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "posts", "reject", "{{postId}}"]
+            },
+            "description": "Admin endpoint: Reject a pending post."
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. AI Integration - Content Improvement",
+      "item": [
+        {
+          "name": "Improve Content with AI (POST /ai/improve/:postId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.newDraft && response.newDraft._id) {",
+                  "    pm.collectionVariables.set('newDraftId', response.newDraft._id);",
+                  "    console.log('AI Generated Draft ID:', response.newDraft._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ai/improve/{{postId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "improve", "{{postId}}"]
+            },
+            "description": "Improve post content using Google Gemini AI and save as a new draft under the same user with a new ID, preserving the original draft."
+          }
+        }
+      ]
+    }
+  ]
+}
